@@ -1,6 +1,6 @@
 {
-  "name": "use-hooks",
-  "version": "0.0.0",
+  "name": "@dhmk/use-hooks",
+  "version": "0.0.1",
   "description": "React state manager based on hooks",
   "keywords": [
     "react",
