@@ -40,7 +40,7 @@ export function Provider({ state, children }) {
 
 export const useSelector = <T, S = any>(
   fn: (state: S) => T,
-  eq = Object.is
+  eq: (a: T, b: T) => boolean = Object.is
 ) => {
   const { getState, subscribe } = React.useContext(StoreContext);
   const update = useUpdate();
@@ -65,7 +65,7 @@ export const useSelector = <T, S = any>(
     () =>
       subscribe(() => {
         try {
-          const prevSelectedState = selectedStateRef.current;
+          const prevSelectedState = selectedStateRef.current!;
           const nextSelectedState = fnRef.current(getState());
 
           if (eq(prevSelectedState, nextSelectedState)) return;
@@ -82,4 +82,4 @@ export const useSelector = <T, S = any>(
 };
 
 export const createSelectorHook = <S>() =>
-  useSelector as <T>(fn: (state: S) => T) => T;
+  useSelector as <T>(fn: (state: S) => T, eq?: (a: T, b: T) => boolean) => T;
