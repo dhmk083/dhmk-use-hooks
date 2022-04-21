@@ -38,5 +38,8 @@
   },
   "peerDependencies": {
     "react": ">=16.8"
+  },
+  "dependencies": {
+    "use-sync-external-store": "^1.0.0"
   }
 }

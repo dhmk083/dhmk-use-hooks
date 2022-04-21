@@ -1,5 +1,5 @@
 import React from "react";
-import { useUpdate, useIsomorphicLayoutEffect } from "./utils";
+import { useSyncExternalStoreWithSelector } from "use-sync-external-store/shim/with-selector";
 
 type Store<T> = {
   getState(): T;
@@ -43,42 +43,14 @@ export const useSelector = <T, S = any>(
   eq: (a: T, b: T) => boolean = Object.is
 ) => {
   const { getState, subscribe } = React.useContext(StoreContext);
-  const update = useUpdate();
-  const selectedStateRef = React.useRef<T>();
-  const fnRef = React.useRef<any>();
 
-  const prevSelectedState = selectedStateRef.current;
-  const nextSelectedState = fn(getState());
-
-  // try to reuse the old value to keep references stable
-  const result =
-    prevSelectedState !== undefined && eq(prevSelectedState, nextSelectedState)
-      ? prevSelectedState
-      : nextSelectedState;
-
-  useIsomorphicLayoutEffect(() => {
-    fnRef.current = fn;
-    selectedStateRef.current = result;
-  });
-
-  useIsomorphicLayoutEffect(
-    () =>
-      subscribe(() => {
-        try {
-          const prevSelectedState = selectedStateRef.current!;
-          const nextSelectedState = fnRef.current(getState());
-
-          if (eq(prevSelectedState, nextSelectedState)) return;
-
-          selectedStateRef.current = nextSelectedState;
-        } catch (e) {}
-
-        update();
-      }),
-    [getState, subscribe]
+  return useSyncExternalStoreWithSelector(
+    subscribe,
+    getState,
+    getState,
+    fn,
+    eq
   );
-
-  return result;
 };
 
 export const createSelectorHook = <S>() =>
